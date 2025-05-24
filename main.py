@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # Get OpenAI API key
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        api_key = input("Enter your OpenAI API key: ")
+        raise ValueError("OPENAI_API_KEY is not set in the environment variables env.yml")
 
     print("You have 5 seconds to focus the target textbox...")
     time.sleep(5)
