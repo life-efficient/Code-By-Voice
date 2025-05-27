@@ -1,1 +1,10 @@
 .env
+.conda
+.vscode
+.idea
+.venv
+.env.local
+.env.development.local
+.env.test.local
+models/
+__pycache__/*.pyc

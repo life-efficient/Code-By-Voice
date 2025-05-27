@@ -1,0 +1,11 @@
+name: code-by-voice
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - vosk
+      - sounddevice
+      - pyautogui 
