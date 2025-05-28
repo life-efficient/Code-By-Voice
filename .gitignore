@@ -8,3 +8,4 @@
 .env.test.local
 models/
 __pycache__/*.pyc
+.DS_Store
