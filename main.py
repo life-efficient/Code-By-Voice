@@ -10,6 +10,7 @@ import tempfile
 import wave
 import openai
 from dotenv import load_dotenv
+from playsound import playsound
 
 # Load environment variables from .env
 load_dotenv()
@@ -71,6 +72,12 @@ def transcribe_with_openai(audio_path):
         )
     return transcript.text if hasattr(transcript, 'text') else transcript
 
+def play_sound(sound_path):
+    try:
+        playsound(sound_path)
+    except Exception as e:
+        print(f"Could not play sound: {e}")
+
 def transcribe_microphone():
     rec = vosk.KaldiRecognizer(model, samplerate)
     WAKE_WORD = "jarvis"
@@ -109,6 +116,7 @@ def transcribe_microphone():
                         listening = True
                         partial_accum = []
                         recorder.start()
+                        play_sound('sounds/positive.m4a')  # Play "yeah" sound
                         print("[Jarvis activated] Start speaking...")
                 else:
                     # Check for end phrase
@@ -117,11 +125,13 @@ def transcribe_microphone():
                         if end_phrase in full_text:
                             listening = False
                             recorder.stop()
+                            play_sound('sounds/loading.m4a')  # Play loading sound
                             print("[Jarvis deactivated] Processing...")
                             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
                                 recorder.save(tmpfile.name)
                                 print(f"Saved audio to {tmpfile.name}")
                                 transcript = transcribe_with_openai(tmpfile.name)
+                                play_sound('sounds/whip.m4a')  # Play whip sound after transcription
                                 print(f"OpenAI Transcript: {transcript}")
                                 pyautogui.write(transcript)
                                 # pyautogui.press('enter')  # Uncomment to press enter after typing
@@ -134,6 +144,7 @@ def transcribe_microphone():
                         listening = True
                         partial_accum = []
                         recorder.start()
+                        play_sound('sounds/positive.m4a')  # Play "yeah" sound
                         print("[Jarvis activated] Start speaking...")
                 else:
                     if partial_text:
@@ -145,11 +156,13 @@ def transcribe_microphone():
                             if end_phrase in joined:
                                 listening = False
                                 recorder.stop()
+                                play_sound('sounds/loading.m4a')  # Play loading sound
                                 print("[Jarvis deactivated] Processing...")
                                 with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
                                     recorder.save(tmpfile.name)
                                     print(f"Saved audio to {tmpfile.name}")
                                     transcript = transcribe_with_openai(tmpfile.name)
+                                    play_sound('sounds/whip.m4a')  # Play whip sound after transcription
                                     print(f"OpenAI Transcript: {transcript}")
                                     pyautogui.write(transcript)
                                     # pyautogui.press('enter')  # Uncomment to press enter after typing
@@ -163,9 +176,11 @@ def main():
             transcribe_microphone()
             time.sleep(0.1)
     except KeyboardInterrupt:
+        play_sound('sounds/disconnect.m4a')  # Play disconnect sound
         print("\nExiting program. Goodbye!") 
     except Exception as e:
         print(f"Error: {str(e)}")
+        play_sound('sounds/disconnect.m4a')  # Play disconnect sound on error
         return None
 
 if __name__ == "__main__":
