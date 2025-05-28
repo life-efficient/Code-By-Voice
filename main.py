@@ -134,7 +134,7 @@ def transcribe_microphone():
                                 play_sound('sounds/whip.m4a')  # Play whip sound after transcription
                                 print(f"OpenAI Transcript: {transcript}")
                                 pyautogui.write(transcript)
-                                # pyautogui.press('enter')  # Uncomment to press enter after typing
+                                pyautogui.press('enter')  # Uncomment to press enter after typing
                             break
             else:
                 partial = json.loads(rec.PartialResult())
