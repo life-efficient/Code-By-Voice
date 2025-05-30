@@ -85,7 +85,7 @@ def main():
     schema, url = fetch_openapi_schema()
     tools = extract_tool_definitions(schema, url)
     with open('tools.json', 'w') as f:
-        json.dump(tools, f, indent=2)
+        json.dump(tools, f, indent=4)
     print(f"Extracted {len(tools)} tool definitions. See tools.json for details.")
     # Uncomment the next line to print a summary for debugging
     # print_tools_summary(tools)
