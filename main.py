@@ -11,6 +11,7 @@ import openai
 from dotenv import load_dotenv
 from playsound import playsound
 import requests
+import get_tools  # Import the get_tools module
 
 # Load environment variables from .env
 load_dotenv()
@@ -31,9 +32,10 @@ q = queue.Queue()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Load tools for OpenAI tool calling
-with open('tools.json', 'r') as f:
-    TOOLS = json.load(f)
+# Use get_tools to load tool definitions
+schema, schema_url = get_tools.fetch_openapi_schema()
+TOOLS = get_tools.extract_tool_definitions(schema, schema_url)
+OPENAI_TOOLS = get_tools.extract_openai_tools(TOOLS)
 
 # Helper to record audio to a WAV file
 class AudioRecorder:
@@ -96,25 +98,33 @@ def speak_with_openai_tts(text, voice="alloy"):  # You can change the voice as n
 def run_tool_call(tool_call):
     """Executes a tool call (currently only HTTP tools)."""
     call = tool_call['call']
-    return 'Success'
     if call['type'] == 'http':
         url = call['host'] + call['path']
         method = call['method'].upper()
         params = tool_call.get('parameters', {})
-        if method == 'get':
-            resp = requests.get(url, params=params)
-        elif method == 'post':
-            resp = requests.post(url, json=params)
-        elif method == 'patch':
-            resp = requests.patch(url, json=params)
-        elif method == 'delete':
-            resp = requests.delete(url, params=params)
-        else:
-            return f"Unsupported HTTP method: {method}"
+        # Remove parameters that are part of the path
+        path_params = {}
+        for key in list(params.keys()):
+            if '{' + key + '}' in call['path']:
+                url = url.replace('{' + key + '}', str(params[key]))
+                path_params[key] = params.pop(key)
         try:
-            return resp.json()
-        except Exception:
-            return resp.text
+            if method == 'GET':
+                resp = requests.get(url, params=params)
+            elif method == 'POST':
+                resp = requests.post(url, json=params)
+            elif method == 'PATCH':
+                resp = requests.patch(url, json=params)
+            elif method == 'DELETE':
+                resp = requests.delete(url, params=params)
+            else:
+                return f"Unsupported HTTP method: {method}"
+            try:
+                return resp.json()
+            except Exception:
+                return resp.text
+        except Exception as e:
+            return f"HTTP request failed: {e}"
     else:
         return f"Unsupported tool type: {call['type']}"
 
@@ -123,7 +133,7 @@ def process_transcript_and_respond(transcript):
     response = openai.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": transcript}],
-        tools=TOOLS,
+        tools=OPENAI_TOOLS,
         tool_choice="auto"
     )
     message = response.choices[0].message
@@ -234,8 +244,8 @@ def voice_loop():
                             break
 
 def main():
-    print("You have 5 seconds to focus the target textbox...")
-    time.sleep(5)
+    # print("You have 5 seconds to focus the target textbox...")
+    # time.sleep(5)
     try:
         while True:
             voice_loop()
@@ -243,10 +253,10 @@ def main():
     except KeyboardInterrupt:
         play_sound('sounds/disconnect.m4a')
         print("\nExiting program. Goodbye!")
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        play_sound('sounds/disconnect.m4a')
-        return None
+    # except Exception as e:
+    #     print(f"Error: {str(e)}")
+    #     play_sound('sounds/disconnect.m4a')
+    #     return None
 
 if __name__ == "__main__":
     main()

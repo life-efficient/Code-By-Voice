@@ -69,9 +69,10 @@ def extract_tool_definitions(schema, schema_url):
 
 def extract_openai_tools(tools):
     """
-    Extracts only the OpenAI-ready tool definitions (name, description, parameters) from the full tool list.
+    Extracts only the OpenAI-ready tool definitions (name, description, parameters, type) from the full tool list.
+    Dumps the result to openai_tools.json for inspection.
     """
-    return [
+    openai_tools = [
         {
             'type': 'function',
             'name': tool['name'],
@@ -80,6 +81,9 @@ def extract_openai_tools(tools):
         }
         for tool in tools
     ]
+    with open('openai_tools.json', 'w') as f:
+        json.dump(openai_tools, f, indent=4)
+    return openai_tools
 
 def main():
     schema, url = fetch_openapi_schema()

@@ -1,0 +1,90 @@
+[
+  {
+    "type": "function",
+    "name": "get_people",
+    "description": "List all people",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "post_people",
+    "description": "Create a new person",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "description": "Request body (application/json)"
+        }
+      },
+      "required": [
+        "body"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "get_people__id_",
+    "description": "Get a person by ID",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": ""
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "patch_people__id_",
+    "description": "Update a person by ID",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": ""
+        },
+        "body": {
+          "type": "object",
+          "description": "Request body (application/json)"
+        }
+      },
+      "required": [
+        "id",
+        "body"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "delete_people__id_",
+    "description": "Delete a person by ID",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": ""
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    }
+  }
+]
