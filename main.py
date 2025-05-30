@@ -130,9 +130,10 @@ def run_tool_call(tool_call):
 
 def process_transcript_and_respond(transcript):
     print(f"User said: {transcript}")
-    response = openai.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "user", "content": transcript}],
+    print('OPENAI_TOOLS', OPENAI_TOOLS)
+    response = openai.responses.create(
+        model="gpt-4.1-nano",
+        input=[{"role": "user", "content": transcript}],
         tools=OPENAI_TOOLS,
         tool_choice="auto"
     )
