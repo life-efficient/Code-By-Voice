@@ -96,6 +96,7 @@ def speak_with_openai_tts(text, voice="alloy"):  # You can change the voice as n
 def run_tool_call(tool_call):
     """Executes a tool call (currently only HTTP tools)."""
     call = tool_call['call']
+    return 'Success'
     if call['type'] == 'http':
         url = call['host'] + call['path']
         method = call['method'].upper()
@@ -126,6 +127,7 @@ def process_transcript_and_respond(transcript):
         tool_choice="auto"
     )
     message = response.choices[0].message
+    print('message', message)
     # Handle tool calls
     if hasattr(message, 'tool_calls') and message.tool_calls:
         for tool_call in message.tool_calls:
@@ -144,6 +146,16 @@ def process_transcript_and_respond(transcript):
         ai_text = message.content
         print(f"AI: {ai_text}")
         speak_with_openai_tts(ai_text)
+
+WAKE_WORD = "jarvis"
+END_PHRASES = [
+    "jarvis done",
+    "jarvis send",
+    "jarvis go",
+    "jarvis enter",
+    "jarvis finish",
+    "over"
+]
 
 def handle_wake_word(text, listening, recorder, partial_accum):
     if WAKE_WORD in text:
@@ -164,17 +176,16 @@ def handle_end_phrase(text, listening, recorder):
             return True, listening
     return False, listening
 
+def handle_end_of_utterance(recorder):
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
+        recorder.save(tmpfile.name)
+        print(f"Saved audio to {tmpfile.name}")
+        transcript = transcribe_with_openai(tmpfile.name)
+        play_sound('sounds/whip.m4a')
+        process_transcript_and_respond(transcript)
+
 def voice_loop():
     rec = vosk.KaldiRecognizer(model, samplerate)
-    WAKE_WORD = "jarvis"
-    END_PHRASES = [
-        "jarvis done",
-        "jarvis send",
-        "jarvis go",
-        "jarvis enter",
-        "jarvis finish",
-        "over"
-    ]
     print(
         "Say 'Jarvis' to start dictation.\n"
         "End with :'\n" 
@@ -204,12 +215,7 @@ def voice_loop():
                 else:
                     end_phrase_found, listening = handle_end_phrase(text, listening, recorder)
                     if end_phrase_found:
-                        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
-                            recorder.save(tmpfile.name)
-                            print(f"Saved audio to {tmpfile.name}")
-                            transcript = transcribe_with_openai(tmpfile.name)
-                            play_sound('sounds/whip.m4a')
-                            process_transcript_and_respond(transcript)
+                        handle_end_of_utterance(recorder)
                         break
             else:
                 partial = json.loads(rec.PartialResult())
@@ -224,12 +230,7 @@ def voice_loop():
                         joined = " ".join(partial_accum).lower()
                         end_phrase_found, listening = handle_end_phrase(joined, listening, recorder)
                         if end_phrase_found:
-                            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
-                                recorder.save(tmpfile.name)
-                                print(f"Saved audio to {tmpfile.name}")
-                                transcript = transcribe_with_openai(tmpfile.name)
-                                play_sound('sounds/whip.m4a')
-                                process_transcript_and_respond(transcript)
+                            handle_end_of_utterance(recorder)
                             break
 
 def main():
