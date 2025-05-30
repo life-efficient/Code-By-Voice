@@ -132,34 +132,44 @@ def run_tool_call(tool_call):
 
 def process_transcript_and_respond(transcript):
     print(f"User said: {transcript}")
-    print('OPENAI_TOOLS', OPENAI_TOOLS)
-    print(OPENAI_TOOLS[0])
     response = client.responses.create(
         model="gpt-4.1-nano",
         input=[{"role": "user", "content": transcript}],
         tools=OPENAI_TOOLS,
         tool_choice="auto"
     )
-    message = response.choices[0].message
-    print('message', message)
-    # Handle tool calls
-    if hasattr(message, 'tool_calls') and message.tool_calls:
-        for tool_call in message.tool_calls:
+    msg = response.output[0]
+    if len(response.output) > 1:
+        raise NotImplementedError("Multiple messages in response - not yet handled")
+    if msg.type == "function_call":
+        tool_name = msg.name
+        arguments = json.loads(msg.arguments)
+        # Find the tool definition to get the call metadata
+        tool_def = next((t for t in TOOLS if t['name'] == tool_name), None)
+        if tool_def:
+            tool_call = {"call": tool_def["call"], "parameters": arguments}
             tool_result = run_tool_call(tool_call)
+            # Send tool result back to the model for a follow-up response
             followup = client.responses.create(
-                model="gpt-4o",
-                messages=[
+                model="gpt-4.1-nano",
+                input=[
                     {"role": "user", "content": transcript},
                     {"role": "tool", "content": str(tool_result)}
-                ]
+                ],
+                tools=OPENAI_TOOLS,
+                tool_choice="auto"
             )
-            final_text = followup.choices[0].message.content
-            print(f"AI: {final_text}")
-            speak_with_openai_tts(final_text)
-    else:
-        ai_text = message.content
-        print(f"AI: {ai_text}")
-        speak_with_openai_tts(ai_text)
+            followup_msg = followup.output[0]
+            if followup_msg.type == "message":
+                for part in followup_msg.content:
+                    if part.type == "output_text":
+                        print(f"AI: {part.text}")
+                        speak_with_openai_tts(part.text)
+            else:
+                print(f"Tool definition for {tool_name} not found.")
+    elif msg.type == "message":
+        print(f"AI: {msg.content[0].text}")
+        speak_with_openai_tts(msg.content[0].text)
 
 WAKE_WORD = "jarvis"
 END_PHRASES = [
