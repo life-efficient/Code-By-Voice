@@ -194,7 +194,9 @@ def voice_loop():
             data = q.get()
             if listening:
                 recorder.add(data)
-            if rec.AcceptWaveform(data):
+            # Check if the recognizer has detected a final utterance (complete phrase)
+            is_final_utterance = rec.AcceptWaveform(data)  # True if a complete phrase/utterance is ready, False if only a partial result
+            if is_final_utterance:
                 result = json.loads(rec.Result())
                 text = result["text"].lower()
                 if not listening:
