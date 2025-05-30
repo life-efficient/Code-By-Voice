@@ -16,6 +16,8 @@ import get_tools  # Import the get_tools module
 # Load environment variables from .env
 load_dotenv()
 
+client = openai.OpenAI()
+
 # Initialize Vosk model
 model_path = "models/vosk-model-small-en-us-0.15"  # Path to the extracted model folder
 if not os.path.exists(model_path):
@@ -131,7 +133,8 @@ def run_tool_call(tool_call):
 def process_transcript_and_respond(transcript):
     print(f"User said: {transcript}")
     print('OPENAI_TOOLS', OPENAI_TOOLS)
-    response = openai.responses.create(
+    print(OPENAI_TOOLS[0])
+    response = client.responses.create(
         model="gpt-4.1-nano",
         input=[{"role": "user", "content": transcript}],
         tools=OPENAI_TOOLS,
@@ -143,7 +146,7 @@ def process_transcript_and_respond(transcript):
     if hasattr(message, 'tool_calls') and message.tool_calls:
         for tool_call in message.tool_calls:
             tool_result = run_tool_call(tool_call)
-            followup = openai.chat.completions.create(
+            followup = client.responses.create(
                 model="gpt-4o",
                 messages=[
                     {"role": "user", "content": transcript},
