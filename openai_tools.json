@@ -1,0 +1,115 @@
+[
+  {
+    "name": "get_people",
+    "description": "List all people",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "call": {
+      "type": "http",
+      "host": "/api",
+      "method": "get",
+      "path": "/people"
+    }
+  },
+  {
+    "name": "post_people",
+    "description": "Create a new person",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "description": "Request body (application/json)"
+        }
+      },
+      "required": [
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "call": {
+      "type": "http",
+      "host": "/api",
+      "method": "post",
+      "path": "/people"
+    }
+  },
+  {
+    "name": "get_people__id_",
+    "description": "Get a person by ID",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": ""
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "call": {
+      "type": "http",
+      "host": "/api",
+      "method": "get",
+      "path": "/people/{id}"
+    }
+  },
+  {
+    "name": "patch_people__id_",
+    "description": "Update a person by ID",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": ""
+        },
+        "body": {
+          "type": "object",
+          "description": "Request body (application/json)"
+        }
+      },
+      "required": [
+        "id",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "call": {
+      "type": "http",
+      "host": "/api",
+      "method": "patch",
+      "path": "/people/{id}"
+    }
+  },
+  {
+    "name": "delete_people__id_",
+    "description": "Delete a person by ID",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": ""
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "call": {
+      "type": "http",
+      "host": "/api",
+      "method": "delete",
+      "path": "/people/{id}"
+    }
+  }
+]

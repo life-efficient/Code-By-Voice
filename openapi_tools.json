@@ -1,0 +1,76 @@
+[
+  {
+    "name": "get_people",
+    "method": "get",
+    "path": "/people",
+    "description": "List all people",
+    "parameters": []
+  },
+  {
+    "name": "post_people",
+    "method": "post",
+    "path": "/people",
+    "description": "Create a new person",
+    "parameters": [
+      {
+        "name": "body",
+        "in": "body",
+        "required": true,
+        "type": "object",
+        "description": "Request body (application/json)"
+      }
+    ]
+  },
+  {
+    "name": "get_people__id_",
+    "method": "get",
+    "path": "/people/{id}",
+    "description": "Get a person by ID",
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "type": "string",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "patch_people__id_",
+    "method": "patch",
+    "path": "/people/{id}",
+    "description": "Update a person by ID",
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "type": "string",
+        "description": ""
+      },
+      {
+        "name": "body",
+        "in": "body",
+        "required": true,
+        "type": "object",
+        "description": "Request body (application/json)"
+      }
+    ]
+  },
+  {
+    "name": "delete_people__id_",
+    "method": "delete",
+    "path": "/people/{id}",
+    "description": "Delete a person by ID",
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "type": "string",
+        "description": ""
+      }
+    ]
+  }
+]
