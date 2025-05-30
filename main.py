@@ -13,9 +13,13 @@ from playsound import playsound
 import requests
 import get_tools  # Import the get_tools module
 import pprint
+from supabase_auth import get_supabase_access_token
 
 # Load environment variables from .env
 load_dotenv()
+
+token = get_supabase_access_token()
+print(token)
 
 client = openai.OpenAI()
 
