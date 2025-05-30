@@ -145,6 +145,25 @@ def process_transcript_and_respond(transcript):
         print(f"AI: {ai_text}")
         speak_with_openai_tts(ai_text)
 
+def handle_wake_word(text, listening, recorder, partial_accum):
+    if WAKE_WORD in text:
+        listening = True
+        partial_accum.clear()
+        recorder.start()
+        play_sound('sounds/positive.m4a')
+        print("[Jarvis activated] Start speaking...")
+    return listening
+
+def handle_end_phrase(text, listening, recorder):
+    for end_phrase in END_PHRASES:
+        if end_phrase in text:
+            listening = False
+            recorder.stop()
+            play_sound('sounds/loading.m4a')
+            print("[Jarvis deactivated] Processing...")
+            return True, listening
+    return False, listening
+
 def voice_loop():
     rec = vosk.KaldiRecognizer(model, samplerate)
     WAKE_WORD = "jarvis"
@@ -177,21 +196,32 @@ def voice_loop():
                 recorder.add(data)
             if rec.AcceptWaveform(data):
                 result = json.loads(rec.Result())
+                text = result["text"].lower()
                 if not listening:
-                    if WAKE_WORD in result["text"].lower():
-                        listening = True
-                        partial_accum = []
-                        recorder.start()
-                        play_sound('sounds/positive.m4a')
-                        print("[Jarvis activated] Start speaking...")
+                    listening = handle_wake_word(text, listening, recorder, partial_accum)
                 else:
-                    full_text = result["text"].lower()
-                    for end_phrase in END_PHRASES:
-                        if end_phrase in full_text:
-                            listening = False
-                            recorder.stop()
-                            play_sound('sounds/loading.m4a')
-                            print("[Jarvis deactivated] Processing...")
+                    end_phrase_found, listening = handle_end_phrase(text, listening, recorder)
+                    if end_phrase_found:
+                        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
+                            recorder.save(tmpfile.name)
+                            print(f"Saved audio to {tmpfile.name}")
+                            transcript = transcribe_with_openai(tmpfile.name)
+                            play_sound('sounds/whip.m4a')
+                            process_transcript_and_respond(transcript)
+                        break
+            else:
+                partial = json.loads(rec.PartialResult())
+                partial_text = partial.get("partial", "").lower()
+                if not listening:
+                    listening = handle_wake_word(partial_text, listening, recorder, partial_accum)
+                else:
+                    if partial_text:
+                        partial_accum.append(partial_text)
+                        if len(partial_accum) > 10:
+                            partial_accum.pop(0)
+                        joined = " ".join(partial_accum).lower()
+                        end_phrase_found, listening = handle_end_phrase(joined, listening, recorder)
+                        if end_phrase_found:
                             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
                                 recorder.save(tmpfile.name)
                                 print(f"Saved audio to {tmpfile.name}")
@@ -199,35 +229,6 @@ def voice_loop():
                                 play_sound('sounds/whip.m4a')
                                 process_transcript_and_respond(transcript)
                             break
-            else:
-                partial = json.loads(rec.PartialResult())
-                partial_text = partial.get("partial", "").lower()
-                if not listening:
-                    if WAKE_WORD in partial_text:
-                        listening = True
-                        partial_accum = []
-                        recorder.start()
-                        play_sound('sounds/positive.m4a')
-                        print("[Jarvis activated] Start speaking...")
-                else:
-                    if partial_text:
-                        partial_accum.append(partial_text)
-                        if len(partial_accum) > 10:
-                            partial_accum.pop(0)
-                        joined = " ".join(partial_accum).lower()
-                        for end_phrase in END_PHRASES:
-                            if end_phrase in joined:
-                                listening = False
-                                recorder.stop()
-                                play_sound('sounds/loading.m4a')
-                                print("[Jarvis deactivated] Processing...")
-                                with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
-                                    recorder.save(tmpfile.name)
-                                    print(f"Saved audio to {tmpfile.name}")
-                                    transcript = transcribe_with_openai(tmpfile.name)
-                                    play_sound('sounds/whip.m4a')
-                                    process_transcript_and_respond(transcript)
-                                break
 
 def main():
     print("You have 5 seconds to focus the target textbox...")
