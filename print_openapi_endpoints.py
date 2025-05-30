@@ -73,6 +73,7 @@ def extract_openai_tools(tools):
     """
     return [
         {
+            'type': 'function',
             'name': tool['name'],
             'description': tool['description'],
             'parameters': tool['parameters']
