@@ -67,14 +67,28 @@ def extract_tool_definitions(schema, schema_url):
             })
     return tools
 
+def extract_openai_tools(tools):
+    """
+    Extracts only the OpenAI-ready tool definitions (name, description, parameters) from the full tool list.
+    """
+    return [
+        {
+            'name': tool['name'],
+            'description': tool['description'],
+            'parameters': tool['parameters']
+        }
+        for tool in tools
+    ]
+
 def main():
     schema, url = fetch_openapi_schema()
     tools = extract_tool_definitions(schema, url)
-    with open('openai_tools.json', 'w') as f:
+    with open('tools.json', 'w') as f:
         json.dump(tools, f, indent=2)
-    print(f"Extracted {len(tools)} tool definitions. See openai_tools.json for details.")
+    print(f"Extracted {len(tools)} tool definitions. See tools.json for details.")
     # Uncomment the next line to print a summary for debugging
     # print_tools_summary(tools)
+    # To get OpenAI-ready tools, use: openai_tools = extract_openai_tools(tools)
 
 def print_tools_summary(tools):
     for tool in tools:
