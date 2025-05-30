@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from playsound import playsound
 import requests
 import get_tools  # Import the get_tools module
+import pprint
 
 # Load environment variables from .env
 load_dotenv()
@@ -140,7 +141,9 @@ def process_transcript_and_respond(transcript):
     )
     msg = response.output[0]
     if len(response.output) > 1:
-        raise NotImplementedError("Multiple messages in response - not yet handled")
+        print('More response outputs than handled - look into this. len(response.output)', len(response.output))
+        pprint.pprint(response.output)
+        # raise NotImplementedError("Multiple messages in response - not yet handled")
     if msg.type == "function_call":
         tool_name = msg.name
         arguments = json.loads(msg.arguments)
@@ -149,12 +152,24 @@ def process_transcript_and_respond(transcript):
         if tool_def:
             tool_call = {"call": tool_def["call"], "parameters": arguments}
             tool_result = run_tool_call(tool_call)
+            print('tool_result', tool_result)
             # Send tool result back to the model for a follow-up response
+            tool_result_input = {
+                "call_id": msg.call_id,
+                "output": json.dumps(tool_result),
+                "type": "function_call_output"
+            }
+            # Convert msg to dict for API input (use model_dump if available, else __dict__)
+            try:
+                function_call_suggestion = msg.model_dump()
+            except AttributeError:
+                function_call_suggestion = msg.__dict__
             followup = client.responses.create(
                 model="gpt-4.1-nano",
                 input=[
                     {"role": "user", "content": transcript},
-                    {"role": "tool", "content": str(tool_result)}
+                    function_call_suggestion,
+                    tool_result_input
                 ],
                 tools=OPENAI_TOOLS,
                 tool_choice="auto"
