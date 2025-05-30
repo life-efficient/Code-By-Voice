@@ -10,13 +10,8 @@ def fetch_openapi_schema(url="http://localhost:3000/api/openapi"):
 
 def extract_tool_definitions(schema, schema_url):
     tools = []
-    # Determine host from OpenAPI servers or schema_url
-    servers = schema.get('servers', [])
-    if servers:
-        host = servers[0]['url']
-    else:
-        parsed = urlparse(schema_url)
-        host = f"{parsed.scheme}://{parsed.netloc}"
+    # Always use the correct host with /api suffix
+    host = "http://localhost:3000/api"
     for path, methods in schema.get('paths', {}).items():
         for method, details in methods.items():
             # Tool name: method + path, e.g., get_people_id
