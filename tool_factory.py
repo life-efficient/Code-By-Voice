@@ -36,17 +36,26 @@ from run_tool_calls import run_http_tool_call
 
 tools = get_tools()
 
+def make_tool_function(tool_def):
+    """
+    Returns a function that takes keyword arguments matching the tool's parameters.
+    """
+    def func(input_word: str):
+        return "Hello world"
+    func.__name__ = tool_def['name']
+    func.__doc__ = generate_tool_docstring(tool_def)
+    return func
+
 generated_function_tools = []
-# for tool_call_definition in tools:
-#     if tool_call_definition['call']['type'] == 'http':
+# for tool_def in tools:
+#     if tool_def['call']['type'] == 'http':
 #         generated_function_tool = function_tool(
-#             func=lambda params: run_http_tool_call(tool_call_definition, params),
-#             name_override=tool_call_definition['name'],
-#             description_override=generate_tool_docstring(tool_call_definition),
+#             func=make_tool_function(tool_def),
+#             name_override=tool_def['name'],
+#             description_override=generate_tool_docstring(tool_def),
 #             strict_mode=True,
 #         )
 #         generated_function_tools.append(generated_function_tool)
-#     break
 
 def get_people_tool():
     get_people_tool_definition = tools[0]
@@ -70,21 +79,28 @@ def double_number(number: int):
     """
     return number * 2
 
+double_number_tool_definition = {
+    "name": "double_number",
+    "description": "Double a number.",
+    "parameters": {
+        "number": {"type": "integer", "description": "The number to double."}
+    }
+}
+
 def generate_dummy_tool():
+    tool_def = double_number_tool_definition
+    # tool_def = tools[0]
 
-    tool_def = tools[0]
-    def wrapper(**parameterz):
-        return run_http_tool_call(tool_def, parameterz)
-
-    generated_function_tool = function_tool(
-        func=lambda parameeters: wrapper(parameeters),
-        description_override=generate_tool_docstring(tool_def),
+    dynamic_function = make_tool_function(tool_def)
+    return function_tool(
+        func=dynamic_function,
         name_override=tool_def['name'],
+        description_override=generate_tool_docstring(tool_def),
         strict_mode=True,
     )
-    return generated_function_tool
 
 generated_function_tools.append(generate_dummy_tool())
+# generated_function_tools.append(generate_double_number_tool())
 print(generated_function_tools)
 
 if __name__ == "__main__":
