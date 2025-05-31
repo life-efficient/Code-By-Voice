@@ -109,6 +109,7 @@ def run_tool_call(tool_call):
         url = call['host'] + call['path']
         method = call['method'].upper()
         params = tool_call.get('parameters', {})
+        headers = {"Authorization": f"Bearer {token}"}  # Add Bearer token to all requests
         # Remove parameters that are part of the path
         path_params = {}
         for key in list(params.keys()):
@@ -117,13 +118,13 @@ def run_tool_call(tool_call):
                 path_params[key] = params.pop(key)
         try:
             if method == 'GET':
-                resp = requests.get(url, params=params)
+                resp = requests.get(url, params=params, headers=headers)
             elif method == 'POST':
-                resp = requests.post(url, json=params)
+                resp = requests.post(url, json=params, headers=headers)
             elif method == 'PATCH':
-                resp = requests.patch(url, json=params)
+                resp = requests.patch(url, json=params, headers=headers)
             elif method == 'DELETE':
-                resp = requests.delete(url, params=params)
+                resp = requests.delete(url, params=params, headers=headers)
             else:
                 return f"Unsupported HTTP method: {method}"
             try:
