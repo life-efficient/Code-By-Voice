@@ -1,8 +1,8 @@
 from pprint import pprint
 from src.get_tools import get_tools
 from agents import FunctionTool
-from pydantic import create_model
 from run_tool_calls import run_http_tool_call
+from pydantic_model_utils import make_pydantic_model_from_schema
 
 def generate_tool_docstring(tool):
     """
@@ -39,22 +39,10 @@ Returns:
 
 tools = get_tools()
 
-def make_pydantic_model_from_tool(tool_def):
-    """
-    Dynamically creates a Pydantic model for the tool's parameters.
-    Returns the model class.
-    """
-    fields = {}
-    for pname, pinfo in tool_def.get('parameters', {}).get('properties', {}).items():
-        typ = int if pinfo.get('type') == 'integer' else str  # Expand as needed
-        fields[pname] = (typ, ...)
-    model_name = tool_def.get('name', 'Tool') + 'Params'
-    return create_model(model_name, **fields)
-
 generated_function_tools = []
 for tool_def in tools:
     if tool_def['call']['type'] == 'http':
-        ToolModel = make_pydantic_model_from_tool(tool_def)
+        ToolModel = make_pydantic_model_from_schema(tool_def['parameters'], name=tool_def['name'] + 'Params')
         async def on_invoke_tool(ctx, args: str, ToolModel=ToolModel):
             parsed = ToolModel.model_validate_json(args)
             print('tool params', parsed)
@@ -66,7 +54,7 @@ for tool_def in tools:
             on_invoke_tool=on_invoke_tool,
         )
         generated_function_tools.append(tool)
-    break
+
 
 # def get_people_tool():
 #     get_people_tool_definition = tools[0]
