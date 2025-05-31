@@ -18,18 +18,20 @@ You are a virtual assistant called Jarvis. Address the user as "Sir" in all of y
     # handoffs=[account_agent, knowledge_agent, search_agent],
 )
 
+
 async def test_queries():
-    examples = [
-        "What's my ACME account balance doc? My user ID is 1234567890", # Account Agent test
-        "Ooh i've got money to spend! How big is the input and how fast is the output of the dynamite dispenser?", # Knowledge Agent test
-        "Hmmm, what about duck hunting gear - what's trending right now?", # Search Agent test
-    ]
+    inputs = []
     with trace("ACME App Assistant"):
-        for query in examples:
-            result = await Runner.run(triage_agent, query)
-            print(f"User: {query}")
+    # with trace(workflow_name="Conversation", group_id=thread_id):
+        while True:
+            query = input("> ")
+            inputs.append({"role": "user", "content": query})
+            result = await Runner.run(triage_agent, inputs)
             print(result.final_output)
             print("---")
+            inputs = result.to_input_list()
+            
+            
 
 if __name__ == "__main__":
     # Run the tests
