@@ -49,15 +49,35 @@ def filter_required(properties, required):
         if not (properties.get(pname, {}).get("nullable", False))
     ]
 
-def extract_tool_definitions(schema, schema_url):
-    tools = []
-    servers = schema.get('servers', [])
-    if servers:
-        host = servers[0]['url']
+def ensure_required_on_objects(schema):
+    """
+    Recursively ensure every object schema has a 'required' key (even if empty),
+    and that it only includes non-nullable properties.
+    """
+    if isinstance(schema, dict):
+        if schema.get('type') == 'object' and 'properties' in schema:
+            properties = schema['properties']
+            # Use the schema's own 'required' if present, else empty list
+            required = schema.get('required', list(properties.keys()))
+            # Filter out nullable properties
+            filtered_required = filter_required(properties, required)
+            schema['required'] = filtered_required
+            # Recurse into each property
+            for pname, pinfo in properties.items():
+                schema['properties'][pname] = ensure_required_on_objects(pinfo)
+        elif schema.get('type') == 'array' and 'items' in schema:
+            schema['items'] = ensure_required_on_objects(schema['items'])
+        else:
+            for k, v in schema.items():
+                schema[k] = ensure_required_on_objects(v)
+        return schema
+    elif isinstance(schema, list):
+        return [ensure_required_on_objects(item) for item in schema]
     else:
-        from urllib.parse import urlparse
-        parsed = urlparse(schema_url)
-        host = f"{parsed.scheme}://{parsed.netloc}"
+        return schema
+
+def extract_tool_definitions(schema, host):
+    tools = []
     for path, methods in schema.get('paths', {}).items():
         for method, details in methods.items():
             name = f"{method}_{re.sub(r'[^a-zA-Z0-9]', '_', path.strip('/'))}".lower()
@@ -104,6 +124,10 @@ def extract_tool_definitions(schema, schema_url):
                 'required': filtered_required,
                 'additionalProperties': False
             }
+            # Ensure every object (including nested) has a required key
+            param_schema = ensure_required_on_objects(param_schema)
+            # Ensure path is prefixed with /api
+            api_path = path if path.startswith('/api') else '/api' + (path if path.startswith('/') else '/' + path)
             tools.append({
                 'name': name,
                 'description': desc,
@@ -112,7 +136,7 @@ def extract_tool_definitions(schema, schema_url):
                     'type': 'http',
                     'host': host,
                     'method': method,
-                    'path': path
+                    'path': api_path
                 }
             })
     return tools
@@ -135,9 +159,10 @@ def extract_openai_tools(tools):
         json.dump(openai_tools, f, indent=4)
     return openai_tools
 
-def get_tools():
-    schema, url = fetch_openapi_schema()
-    tools = extract_tool_definitions(schema, url)
+def get_tools(host="http://localhost:3000"):
+    openapi_url = host.rstrip('/') + "/api/openapi"
+    schema, _ = fetch_openapi_schema(openapi_url)
+    tools = extract_tool_definitions(schema, host)
     with open('tools.json', 'w') as f:
         json.dump(tools, f, indent=4)
     print(f"Extracted {len(tools)} tool definitions. See tools.json for details.")

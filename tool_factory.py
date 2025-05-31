@@ -54,6 +54,7 @@ for tool_def in tools:
             on_invoke_tool=on_invoke_tool,
         )
         generated_function_tools.append(tool)
+    break
 
 
 # def get_people_tool():

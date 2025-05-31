@@ -10,9 +10,9 @@
         },
         "call": {
             "type": "http",
-            "host": "/api",
+            "host": "http://localhost:3000",
             "method": "get",
-            "path": "/people"
+            "path": "/api/people"
         }
     },
     {
@@ -38,9 +38,9 @@
         },
         "call": {
             "type": "http",
-            "host": "/api",
+            "host": "http://localhost:3000",
             "method": "post",
-            "path": "/people"
+            "path": "/api/people"
         }
     },
     {
@@ -61,9 +61,9 @@
         },
         "call": {
             "type": "http",
-            "host": "/api",
+            "host": "http://localhost:3000",
             "method": "get",
-            "path": "/people/{id}"
+            "path": "/api/people/{id}"
         }
     },
     {
@@ -93,9 +93,9 @@
         },
         "call": {
             "type": "http",
-            "host": "/api",
+            "host": "http://localhost:3000",
             "method": "patch",
-            "path": "/people/{id}"
+            "path": "/api/people/{id}"
         }
     },
     {
@@ -116,9 +116,9 @@
         },
         "call": {
             "type": "http",
-            "host": "/api",
+            "host": "http://localhost:3000",
             "method": "delete",
-            "path": "/people/{id}"
+            "path": "/api/people/{id}"
         }
     }
 ]
