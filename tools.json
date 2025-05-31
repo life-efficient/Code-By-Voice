@@ -117,5 +117,408 @@
             "method": "patch",
             "path": "/api/people/{id}"
         }
+    },
+    {
+        "name": "get_initiatives",
+        "description": "List all initiatives",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "project_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": ""
+                }
+            },
+            "required": [
+                "project_id"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "get",
+            "path": "/api/initiatives"
+        }
+    },
+    {
+        "name": "post_initiatives",
+        "description": "Create a new initiative",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "goal": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "status": {
+                    "type": "string"
+                },
+                "project_id": {
+                    "type": "string"
+                },
+                "latest_summary": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "completed_at": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "title",
+                "goal",
+                "status",
+                "project_id",
+                "latest_summary",
+                "completed_at"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "post",
+            "path": "/api/initiatives"
+        }
+    },
+    {
+        "name": "patch_initiatives__id_",
+        "description": "Update an initiative by ID",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": ""
+                },
+                "title": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "goal": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "status": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "latest_summary": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "completed_at": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "id",
+                "title",
+                "goal",
+                "status",
+                "latest_summary",
+                "completed_at"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "patch",
+            "path": "/api/initiatives/{id}"
+        }
+    },
+    {
+        "name": "get_plan_steps",
+        "description": "List all plan steps for an initiative",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "initiative_id": {
+                    "type": "string",
+                    "description": ""
+                }
+            },
+            "required": [
+                "initiative_id"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "get",
+            "path": "/api/plan-steps"
+        }
+    },
+    {
+        "name": "post_plan_steps",
+        "description": "Create a new plan step",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "initiative_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "order_index": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "initiative_id",
+                "content",
+                "order_index",
+                "status",
+                "due_date"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "post",
+            "path": "/api/plan-steps"
+        }
+    },
+    {
+        "name": "patch_plan_steps__id_",
+        "description": "Update a plan step by ID",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": ""
+                },
+                "content": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "order_index": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "status": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "due_date": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "id",
+                "content",
+                "order_index",
+                "status",
+                "due_date"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "patch",
+            "path": "/api/plan-steps/{id}"
+        }
+    },
+    {
+        "name": "delete_plan_steps__id_",
+        "description": "Delete a plan step by ID",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": ""
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "delete",
+            "path": "/api/plan-steps/{id}"
+        }
+    },
+    {
+        "name": "get_timeline_events",
+        "description": "List all timeline events for an initiative",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "initiative_id": {
+                    "type": "string",
+                    "description": ""
+                }
+            },
+            "required": [
+                "initiative_id"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "get",
+            "path": "/api/timeline-events"
+        }
+    },
+    {
+        "name": "post_timeline_events",
+        "description": "Create a new timeline event",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "initiative_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Timeline event type (see timeline_event_type enum)"
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "The content of the timeline event - a description of the update."
+                }
+            },
+            "required": [
+                "initiative_id",
+                "type",
+                "description"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "post",
+            "path": "/api/timeline-events"
+        }
+    },
+    {
+        "name": "patch_timeline_events__id_",
+        "description": "Update a timeline event by ID",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": ""
+                },
+                "type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Timeline event type (see timeline_event_type enum)"
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "The content of the timeline event - a description of the update."
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "description"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "patch",
+            "path": "/api/timeline-events/{id}"
+        }
+    },
+    {
+        "name": "delete_timeline_events__id_",
+        "description": "Delete a timeline event by ID",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": ""
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "delete",
+            "path": "/api/timeline-events/{id}"
+        }
     }
 ]

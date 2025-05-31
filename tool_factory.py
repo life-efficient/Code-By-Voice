@@ -61,10 +61,10 @@ for idx, tool_def in enumerate(tools):
                 on_invoke_tool=on_invoke_tool,
             )
         )
-    if idx == 2:
-        break
+#     if idx == 2:
+#         break
 
-generated_function_tools = generated_function_tools[:2]
+# generated_function_tools = generated_function_tools[:2]
 
 # def get_people_tool():
 #     get_people_tool_definition = tools[0]

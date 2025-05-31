@@ -4,12 +4,16 @@ from agents.voice import AudioInput, SingleAgentVoiceWorkflow, VoicePipeline
 from agent import jarvis
 from agents import trace
 import asyncio
+from openai import OpenAI
 
 async def voice_assistant():
     samplerate = sd.query_devices(kind='input')['default_samplerate']
-    samplerate /= 2
+    samplerate /= 2 # for some reason needed to prevent the agent hearing another language
 
-    pipeline = VoicePipeline(workflow=SingleAgentVoiceWorkflow(jarvis))
+    pipeline = VoicePipeline(
+        workflow=SingleAgentVoiceWorkflow(jarvis),
+    )
+    
     while True:
 
         # Check for input to either provide voice or exit
@@ -23,6 +27,7 @@ async def voice_assistant():
          # Start streaming from microphone until Enter is pressed
         with sd.InputStream(samplerate=samplerate, channels=1, dtype='int16', callback=lambda indata, frames, time, status: recorded_chunks.append(indata.copy())):
             input()
+        print('recording done')
 
         # Concatenate chunks into single buffer
         recording = np.concatenate(recorded_chunks, axis=0)

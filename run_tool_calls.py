@@ -15,6 +15,8 @@ def run_http_tool_call(tool_call_definition, params):
         print('url', url)
         # scsd
         method = call['method'].upper()
+        # Filter out None values from params
+        params = {k: v for k, v in params.items() if v is not None}
         headers = {"Authorization": f"Bearer {token}"}  # Add Bearer token to all requests
         # Remove parameters that are part of the path
         path_params = {}
