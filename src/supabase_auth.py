@@ -1,6 +1,6 @@
 import os
-
-# NOTE: Requires 'supabase' package. Install with: pip install supabase
+import dotenv
+dotenv.load_dotenv()
 
 def get_supabase_access_token(url=None, key=None):
     """
@@ -24,10 +24,10 @@ def get_supabase_access_token(url=None, key=None):
         key = os.getenv("SUPABASE_ANON_KEY")
     if not email or not password:
         print("Missing SUPABASE_EMAIL or SUPABASE_PASSWORD in environment variables.")
-        return None
+        raise Exception("Missing SUPABASE_EMAIL or SUPABASE_PASSWORD in environment variables.")
     if not url or not key:
         print("Missing SUPABASE_URL or SUPABASE_ANON_KEY in environment variables.")
-        return None
+        raise Exception("Missing SUPABASE_URL or SUPABASE_ANON_KEY in environment variables.")
     try:
         from supabase import create_client, Client
     except ImportError:
