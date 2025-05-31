@@ -192,12 +192,13 @@ def process_transcript_and_respond(transcript):
         speak_with_openai_tts(msg.content[0].text)
 
 WAKE_WORD = "jarvis"
+
 END_PHRASES = [
-    "jarvis done",
-    "jarvis send",
-    "jarvis go",
-    "jarvis enter",
-    "jarvis finish",
+    "send it",
+    "let's do it",
+    "let's get it",
+    "make it happen",
+    "let's go",
     "over"
 ]
 
