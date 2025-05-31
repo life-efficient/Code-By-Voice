@@ -117,28 +117,5 @@
             "method": "patch",
             "path": "/api/people/{id}"
         }
-    },
-    {
-        "name": "delete_people__id_",
-        "description": "Delete a person by ID",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "description": ""
-                }
-            },
-            "required": [
-                "id"
-            ],
-            "additionalProperties": false
-        },
-        "call": {
-            "type": "http",
-            "host": "http://localhost:3000",
-            "method": "delete",
-            "path": "/api/people/{id}"
-        }
     }
 ]

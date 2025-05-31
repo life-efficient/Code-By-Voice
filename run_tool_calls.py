@@ -7,7 +7,9 @@ print(token)
 
 def run_http_tool_call(tool_call_definition, params):
     """Executes a tool call by making a HTTP request."""
+    print('name', tool_call_definition['name'])
     call = tool_call_definition['call']
+    print('call', call)
     if call['type'] == 'http':
         url = call['host'] + call['path']
         print('url', url)

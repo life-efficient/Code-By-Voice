@@ -5,43 +5,43 @@ from run_tool_calls import run_http_tool_call
 from pydantic_model_utils import make_pydantic_model_from_schema
 import json
 
-def generate_tool_docstring(tool):
-    """
-    Generate a docstring for a tool function based on its metadata.
+# def generate_tool_docstring(tool):
+#     """
+#     Generate a docstring for a tool function based on its metadata.
 
-    Args:
-        tool (dict): Tool metadata, should include 'name', 'description', 'parameters', 'call' (with 'method' and 'path').
+#     Args:
+#         tool (dict): Tool metadata, should include 'name', 'description', 'parameters', 'call' (with 'method' and 'path').
 
-    Returns:
-        str: A formatted docstring for the tool function.
-    """
-    name = tool.get('name', 'unknown_tool')
-    desc = tool.get('description', '')
-    params = tool.get('parameters', {}).get('properties', {})
+#     Returns:
+#         str: A formatted docstring for the tool function.
+#     """
+#     name = tool.get('name', 'unknown_tool')
+#     desc = tool.get('description', '')
+#     params = tool.get('parameters', {}).get('properties', {})
 
-    param_lines = []
-    for pname, pinfo in params.items():
-        param_lines.append(f"        {pname} ({pinfo.get('type', 'str')}): {pinfo.get('description', '')}")
+#     param_lines = []
+#     for pname, pinfo in params.items():
+#         param_lines.append(f"        {pname} ({pinfo.get('type', 'str')}): {pinfo.get('description', '')}")
 
-    param_section = "\n".join(param_lines) if param_lines else "        None"
+#     param_section = "\n".join(param_lines) if param_lines else "        None"
 
-    docstring = f'''"""
-{name}: {desc}
+#     docstring = f'''"""
+# {name}: {desc}
 
-Args:
-    params (dict): Dictionary of parameters for the tool. Keys:
-{param_section}
+# Args:
+#     params (dict): Dictionary of parameters for the tool. Keys:
+# {param_section}
 
-Returns:
-    dict or str: The response from the HTTP request.
-"""'''
-    print(docstring + "\n\n")
-    return docstring
+# Returns:
+#     dict or str: The response from the HTTP request.
+# """'''
+#     print(docstring + "\n\n")
+#     return docstring
 
 tools = get_tools()
 
 generated_function_tools = []
-for tool_def in tools:
+for idx, tool_def in enumerate(tools):
     if tool_def['call']['type'] == 'http':
         ToolModel = make_pydantic_model_from_schema(tool_def['parameters'], name=tool_def['name'] + 'Params')
         async def on_invoke_tool(ctx, args: str, ToolModel=ToolModel):
@@ -49,15 +49,18 @@ for tool_def in tools:
             parsed = json.loads(args)
             print('tool params', parsed)
             return run_http_tool_call(tool_def, parsed)
-        tool = FunctionTool(
-            name=tool_def['name'],
-            description=tool_def['description'],
-            params_json_schema=tool_def['parameters'],
-            on_invoke_tool=on_invoke_tool,
+        generated_function_tools.append(
+            FunctionTool(
+                name=tool_def['name'],
+                description=tool_def['description'],
+                params_json_schema=tool_def['parameters'],
+                on_invoke_tool=on_invoke_tool,
+            )
         )
-        generated_function_tools.append(tool)
-    break
+    if idx == 2:
+        break
 
+generated_function_tools = generated_function_tools[:2]
 
 # def get_people_tool():
 #     get_people_tool_definition = tools[0]
@@ -81,13 +84,13 @@ for tool_def in tools:
 #     """
 #     return number * 2
 
-double_number_tool_definition = {
-    "name": "double_number",
-    "description": "Double a number.",
-    "parameters": {
-        "number": {"type": "integer", "description": "The number to double."},
-    }
-}
+# double_number_tool_definition = {
+#     "name": "double_number",
+#     "description": "Double a number.",
+#     "parameters": {
+#         "number": {"type": "integer", "description": "The number to double."},
+#     }
+# }
 
 # def generate_dummy_tool():
 #     tool_def = double_number_tool_definition
@@ -104,5 +107,5 @@ double_number_tool_definition = {
 # generated_function_tools.append(generate_double_number_tool())
 pprint(generated_function_tools, indent=4)
 
-if __name__ == "__main__":
-    print(get_people_tool())
+# if __name__ == "__main__":
+    # pprint(generated_function_tools, indent=4)
