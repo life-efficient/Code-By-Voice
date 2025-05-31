@@ -2,3 +2,11 @@ Add custom instructions
 Try elevenlabs voice provider
 Implement HTTP function calls
 Implement pulse MCP
+Improve descriptions of different network methods
+Add descriptions to every key of openapi spec
+Automatically generate openapi spec from nextjs api routes
+Add api routes for other data manipulation
+Deploy OS to cloud with supabase
+Add voice chat loop to agent
+Persist history in voice chat loop
+Customise agent instructions

@@ -18,5 +18,4 @@ async def text_conversation_loop():
 
 
 if __name__ == "__main__":
-    # Run the tests
     asyncio.run(text_conversation_loop())
