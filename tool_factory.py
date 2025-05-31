@@ -67,17 +67,17 @@ def get_people_tool():
     )
     return generated_function_tool
 
-def double_number(number: int):
-    """
-    Double a number.
+# def double_number(number: int):
+#     """
+#     Double a number.
 
-    Args:
-        number (int): The number to double.
+#     Args:
+#         number (int): The number to double.
 
-    Returns:
-        int: The doubled number.
-    """
-    return number * 2
+#     Returns:
+#         int: The doubled number.
+#     """
+#     return number * 2
 
 double_number_tool_definition = {
     "name": "double_number",
