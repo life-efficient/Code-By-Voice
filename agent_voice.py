@@ -7,9 +7,10 @@ import asyncio
 
 async def voice_assistant():
     samplerate = sd.query_devices(kind='input')['default_samplerate']
+    samplerate /= 2
 
+    pipeline = VoicePipeline(workflow=SingleAgentVoiceWorkflow(jarvis))
     while True:
-        pipeline = VoicePipeline(workflow=SingleAgentVoiceWorkflow(jarvis))
 
         # Check for input to either provide voice or exit
         cmd = input("Press Enter to speak your query (or type 'esc' to exit): ")
@@ -42,7 +43,7 @@ async def voice_assistant():
 
         # Play response
         print("Assistant is responding...")
-        sd.play(response_audio, samplerate=samplerate/2)
+        sd.play(response_audio, samplerate=samplerate)
         sd.wait()
         print("---")
 
