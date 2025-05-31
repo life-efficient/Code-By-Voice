@@ -42,7 +42,7 @@ async def voice_assistant():
 
         # Play response
         print("Assistant is responding...")
-        sd.play(response_audio, samplerate=samplerate)
+        sd.play(response_audio, samplerate=samplerate/2)
         sd.wait()
         print("---")
 
