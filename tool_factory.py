@@ -1,3 +1,9 @@
+from pprint import pprint
+from src.get_tools import get_tools
+from agents import FunctionTool
+from pydantic import create_model
+from run_tool_calls import run_http_tool_call
+
 def generate_tool_docstring(tool):
     """
     Generate a docstring for a tool function based on its metadata.
@@ -31,10 +37,6 @@ Returns:
     print(docstring + "\n\n")
     return docstring
 
-from src.get_tools import get_tools
-from agents import FunctionTool
-from pydantic import create_model
-
 tools = get_tools()
 
 def make_pydantic_model_from_tool(tool_def):
@@ -55,6 +57,8 @@ for tool_def in tools:
         ToolModel = make_pydantic_model_from_tool(tool_def)
         async def on_invoke_tool(ctx, args: str, ToolModel=ToolModel):
             parsed = ToolModel.model_validate_json(args)
+            pprint(parsed)
+            return run_http_tool_call(tool_def, parsed)
             return "Hello world"
         params_schema = ToolModel.model_json_schema()
         params_schema["additionalProperties"] = False
@@ -67,15 +71,15 @@ for tool_def in tools:
         generated_function_tools.append(tool)
     break
 
-def get_people_tool():
-    get_people_tool_definition = tools[0]
-    generated_function_tool = FunctionTool(
-        name=get_people_tool_definition['name'],
-        description=generate_tool_docstring(get_people_tool_definition),
-        params_json_schema=make_pydantic_model_from_tool(get_people_tool_definition).model_json_schema(),
-        on_invoke_tool=lambda ctx, args: run_http_tool_call(get_people_tool_definition, args),
-    )
-    return generated_function_tool
+# def get_people_tool():
+#     get_people_tool_definition = tools[0]
+#     generated_function_tool = FunctionTool(
+#         name=get_people_tool_definition['name'],
+#         description=generate_tool_docstring(get_people_tool_definition),
+#         params_json_schema=make_pydantic_model_from_tool(get_people_tool_definition).model_json_schema(),
+#         on_invoke_tool=lambda ctx, args: run_http_tool_call(get_people_tool_definition, args),
+#     )
+#     return generated_function_tool
 
 # def double_number(number: int):
 #     """
@@ -97,16 +101,16 @@ double_number_tool_definition = {
     }
 }
 
-def generate_dummy_tool():
-    tool_def = double_number_tool_definition
-    # tool_def = tools[0]
+# def generate_dummy_tool():
+#     tool_def = double_number_tool_definition
+#     # tool_def = tools[0]
 
-    return FunctionTool(
-        name=tool_def['name'],
-        description=generate_tool_docstring(tool_def),
-        params_json_schema=make_pydantic_model_from_tool(tool_def).model_json_schema(),
-        on_invoke_tool=lambda ctx, args: "Hello world",
-    )
+#     return FunctionTool(
+#         name=tool_def['name'],
+#         description=generate_tool_docstring(tool_def),
+#         params_json_schema=make_pydantic_model_from_tool(tool_def).model_json_schema(),
+#         on_invoke_tool=lambda ctx, args: "Hello world",
+#     )
 
 # generated_function_tools.append(generate_dummy_tool())
 # generated_function_tools.append(generate_double_number_tool())
