@@ -14,6 +14,7 @@ import requests
 import get_tools  # Import the get_tools module
 import pprint
 from supabase_auth import get_supabase_access_token
+from audio_utils import AudioRecorder, callback, transcribe_with_openai, play_sound, speak_with_openai_tts
 
 # Load environment variables from .env
 load_dotenv()
@@ -43,64 +44,6 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 schema, schema_url = get_tools.fetch_openapi_schema()
 TOOLS = get_tools.extract_tool_definitions(schema, schema_url)
 OPENAI_TOOLS = get_tools.extract_openai_tools(TOOLS)
-
-# Helper to record audio to a WAV file
-class AudioRecorder:
-    def __init__(self, samplerate, channels=1):
-        self.samplerate = samplerate
-        self.channels = channels
-        self.frames = []
-        self.recording = False
-
-    def start(self):
-        self.frames = []
-        self.recording = True
-
-    def stop(self):
-        self.recording = False
-
-    def add(self, data):
-        if self.recording:
-            self.frames.append(data)
-
-    def save(self, filename):
-        with wave.open(filename, 'wb') as wf:
-            wf.setnchannels(self.channels)
-            wf.setsampwidth(2)  # 16-bit audio
-            wf.setframerate(self.samplerate)
-            wf.writeframes(b''.join(self.frames))
-
-def callback(indata, frames, time, status):
-    if status:
-        print(status)
-    q.put(bytes(indata))
-
-def transcribe_with_openai(audio_path):
-    with open(audio_path, "rb") as audio_file:
-        transcript = openai.audio.transcriptions.create(
-            model="gpt-4o-mini-transcribe",
-            file=audio_file
-        )
-    return transcript.text if hasattr(transcript, 'text') else transcript
-
-def play_sound(sound_path):
-    try:
-        playsound(sound_path)
-    except Exception as e:
-        print(f"Could not play sound: {e}")
-
-def speak_with_openai_tts(text, voice="alloy"):  # You can change the voice as needed
-    response = openai.audio.speech.create(
-        model="tts-1",
-        voice=voice,
-        input=text
-    )
-    # Save the audio to a temp file and play it
-    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmpfile:
-        tmpfile.write(response.content)
-        tmpfile.flush()
-        os.system(f"afplay '{tmpfile.name}'")  # macOS; use another player for other OSes
-    os.remove(tmpfile.name)
 
 def run_tool_call(tool_call):
     """Executes a tool call (currently only HTTP tools)."""
@@ -242,7 +185,7 @@ def voice_loop():
         "Press Ctrl+C to stop."
     )
     with sd.RawInputStream(samplerate=samplerate, blocksize=8000, device=None,
-                         dtype='int16', channels=1, callback=callback):
+                         dtype='int16', channels=1, callback=lambda indata, frames, time, status: callback(indata, frames, time, status, q)):
         listening = False
         partial_accum = []
         recorder = AudioRecorder(samplerate)
