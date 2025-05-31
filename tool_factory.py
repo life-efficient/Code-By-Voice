@@ -40,15 +40,19 @@ import json
 
 tools = get_tools()
 
+def make_on_invoke_tool(tool_def, ToolModel):
+    async def on_invoke_tool(ctx, args: str):
+        ToolModel.model_validate_json(args)
+        parsed = json.loads(args)
+        print('tool params', parsed)
+        return run_http_tool_call(tool_def, parsed)
+    return on_invoke_tool
+
 generated_function_tools = []
 for idx, tool_def in enumerate(tools):
     if tool_def['call']['type'] == 'http':
         ToolModel = make_pydantic_model_from_schema(tool_def['parameters'], name=tool_def['name'] + 'Params')
-        async def on_invoke_tool(ctx, args: str, ToolModel=ToolModel):
-            ToolModel.model_validate_json(args)
-            parsed = json.loads(args)
-            print('tool params', parsed)
-            return run_http_tool_call(tool_def, parsed)
+        on_invoke_tool = make_on_invoke_tool(tool_def, ToolModel)
         generated_function_tools.append(
             FunctionTool(
                 name=tool_def['name'],
