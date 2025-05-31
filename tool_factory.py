@@ -59,14 +59,14 @@ for tool_def in tools:
             parsed = ToolModel.model_validate_json(args)
             print('tool params', parsed)
             return run_http_tool_call(tool_def, parsed)
-        params_schema = tool_def.get('parameters', {})
         tool = FunctionTool(
             name=tool_def['name'],
-            description=tool_def.get('description', ''),
-            params_json_schema=params_schema,
+            description=tool_def['description'],
+            params_json_schema=tool_def['parameters'],
             on_invoke_tool=on_invoke_tool,
         )
         generated_function_tools.append(tool)
+    break
 
 # def get_people_tool():
 #     get_people_tool_definition = tools[0]
