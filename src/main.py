@@ -45,7 +45,7 @@ schema, schema_url = get_tools.fetch_openapi_schema()
 TOOLS = get_tools.extract_tool_definitions(schema, schema_url)
 OPENAI_TOOLS = get_tools.extract_openai_tools(TOOLS)
 
-def run_tool_call(tool_call):
+def run_http_tool_call(tool_call):
     """Executes a tool call (currently only HTTP tools)."""
     call = tool_call['call']
     if call['type'] == 'http':
@@ -99,7 +99,7 @@ def process_transcript_and_respond(transcript):
         tool_def = next((t for t in TOOLS if t['name'] == tool_name), None)
         if tool_def:
             tool_call = {"call": tool_def["call"], "parameters": arguments}
-            tool_result = run_tool_call(tool_call)
+            tool_result = run_http_tool_call(tool_call)
             print('tool_result', tool_result)
             # Send tool result back to the model for a follow-up response
             tool_result_input = {

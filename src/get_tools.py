@@ -1,14 +1,13 @@
 import requests
 import json
 import re
-from urllib.parse import urlparse
 
 def fetch_openapi_schema(url="http://localhost:3000/api/openapi"):
     response = requests.get(url)
     response.raise_for_status()
     return response.json(), url
 
-def extract_tool_definitions(schema, schema_url):
+def extract_tool_definitions_from_schema(schema, schema_url):
     tools = []
     # Always use the correct host with /api suffix
     host = "http://localhost:3000/api"
@@ -80,15 +79,16 @@ def extract_openai_tools(tools):
         json.dump(openai_tools, f, indent=4)
     return openai_tools
 
-def main():
+def get_tools():
     schema, url = fetch_openapi_schema()
-    tools = extract_tool_definitions(schema, url)
+    tools = extract_tool_definitions_from_schema(schema, url)
     with open('tools.json', 'w') as f:
         json.dump(tools, f, indent=4)
     print(f"Extracted {len(tools)} tool definitions. See tools.json for details.")
     # Uncomment the next line to print a summary for debugging
     # print_tools_summary(tools)
     # To get OpenAI-ready tools, use: openai_tools = extract_openai_tools(tools)
+    return tools
 
 def print_tools_summary(tools):
     for tool in tools:
@@ -103,4 +103,4 @@ def print_tools_summary(tools):
             print("  Parameters: None")
 
 if __name__ == "__main__":
-    main() 
+    get_tools() 
