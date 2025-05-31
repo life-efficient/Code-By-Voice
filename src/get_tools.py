@@ -7,45 +7,101 @@ def fetch_openapi_schema(url="http://localhost:3000/api/openapi"):
     response.raise_for_status()
     return response.json(), url
 
-def extract_tool_definitions_from_schema(schema, schema_url):
+def resolve_ref(ref, root_schema):
+    """Resolve a $ref string like '#/components/schemas/PersonUpdate'."""
+    parts = ref.lstrip('#/').split('/')
+    obj = root_schema
+    for part in parts:
+        obj = obj[part]
+    return obj
+
+def expand_refs(obj, root_schema):
+    """Recursively expand $ref in a schema object."""
+    if isinstance(obj, dict):
+        if '$ref' in obj:
+            resolved = resolve_ref(obj['$ref'], root_schema)
+            # Recursively expand in case the resolved object also contains $ref
+            return expand_refs(resolved, root_schema)
+        else:
+            return {k: expand_refs(v, root_schema) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [expand_refs(item, root_schema) for item in obj]
+    else:
+        return obj
+
+def remove_nullable(obj):
+    """Recursively remove 'nullable' keys from schema objects."""
+    if isinstance(obj, dict):
+        obj = dict(obj)  # shallow copy
+        obj.pop('nullable', None)
+        for k, v in obj.items():
+            obj[k] = remove_nullable(v)
+        return obj
+    elif isinstance(obj, list):
+        return [remove_nullable(item) for item in obj]
+    else:
+        return obj
+
+def filter_required(properties, required):
+    """Remove nullable properties from the required list."""
+    return [
+        pname for pname in required
+        if not (properties.get(pname, {}).get("nullable", False))
+    ]
+
+def extract_tool_definitions(schema, schema_url):
     tools = []
-    # Always use the correct host with /api suffix
-    host = "http://localhost:3000/api"
+    servers = schema.get('servers', [])
+    if servers:
+        host = servers[0]['url']
+    else:
+        from urllib.parse import urlparse
+        parsed = urlparse(schema_url)
+        host = f"{parsed.scheme}://{parsed.netloc}"
     for path, methods in schema.get('paths', {}).items():
         for method, details in methods.items():
-            # Tool name: method + path, e.g., get_people_id
             name = f"{method}_{re.sub(r'[^a-zA-Z0-9]', '_', path.strip('/'))}".lower()
             summary = details.get('summary')
             description = details.get('description')
             desc = summary or description or '(No description)'
-            # Build OpenAI-compatible parameters schema
             properties = {}
-            required = []
+            required = set()
+            # Collect parameters (path, query, etc.)
             for param in details.get('parameters', []):
-                param_schema = param.get('schema', {})
+                param_schema = expand_refs(param.get('schema', {}), schema)
+                cleaned_param_schema = remove_nullable(param_schema)
                 pname = param.get('name')
                 properties[pname] = {
-                    'type': param_schema.get('type', 'string'),
+                    'type': cleaned_param_schema.get('type', 'string'),
                     'description': param.get('description', '')
                 }
                 if param.get('required', False):
-                    required.append(pname)
-            # Handle requestBody parameters (for POST/PATCH)
+                    required.add(pname)
+            # Merge requestBody properties at the top level if present
             if 'requestBody' in details:
                 req_body = details['requestBody']
                 content = req_body.get('content', {})
                 for content_type, content_schema in content.items():
-                    schema_obj = content_schema.get('schema', {})
-                    properties['body'] = {
-                        'type': schema_obj.get('type', 'object'),
-                        'description': f"Request body ({content_type})"
-                    }
-                    if req_body.get('required', False):
-                        required.append('body')
+                    schema_obj = expand_refs(content_schema.get('schema', {}), schema)
+                    if schema_obj.get('type') == 'object':
+                        for pname, pinfo in schema_obj.get('properties', {}).items():
+                            properties[pname] = remove_nullable(pinfo)
+                        # Filter required for nullable
+                        filtered_required = filter_required(schema_obj.get('properties', {}), schema_obj.get('required', []))
+                        for req in filtered_required:
+                            required.add(req)
+                    else:
+                        properties['body'] = remove_nullable(schema_obj)
+                        if req_body.get('required', False):
+                            required.add('body')
+            # Filter required for nullable at the top level
+            filtered_required = filter_required(properties, list(required))
+            # Remove nullable from all properties recursively
+            cleaned_properties = {k: remove_nullable(v) for k, v in properties.items()}
             param_schema = {
                 'type': 'object',
-                'properties': properties,
-                'required': required,
+                'properties': cleaned_properties,
+                'required': filtered_required,
                 'additionalProperties': False
             }
             tools.append({
@@ -81,7 +137,7 @@ def extract_openai_tools(tools):
 
 def get_tools():
     schema, url = fetch_openapi_schema()
-    tools = extract_tool_definitions_from_schema(schema, url)
+    tools = extract_tool_definitions(schema, url)
     with open('tools.json', 'w') as f:
         json.dump(tools, f, indent=4)
     print(f"Extracted {len(tools)} tool definitions. See tools.json for details.")

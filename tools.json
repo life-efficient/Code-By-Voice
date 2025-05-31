@@ -10,7 +10,7 @@
         },
         "call": {
             "type": "http",
-            "host": "http://localhost:3000/api",
+            "host": "/api",
             "method": "get",
             "path": "/people"
         }
@@ -21,19 +21,24 @@
         "parameters": {
             "type": "object",
             "properties": {
-                "body": {
-                    "type": "object",
-                    "description": "Request body (application/json)"
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
                 }
             },
             "required": [
-                "body"
+                "name"
             ],
             "additionalProperties": false
         },
         "call": {
             "type": "http",
-            "host": "http://localhost:3000/api",
+            "host": "/api",
             "method": "post",
             "path": "/people"
         }
@@ -56,7 +61,7 @@
         },
         "call": {
             "type": "http",
-            "host": "http://localhost:3000/api",
+            "host": "/api",
             "method": "get",
             "path": "/people/{id}"
         }
@@ -71,20 +76,24 @@
                     "type": "string",
                     "description": ""
                 },
-                "body": {
-                    "type": "object",
-                    "description": "Request body (application/json)"
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
                 }
             },
             "required": [
-                "id",
-                "body"
+                "id"
             ],
             "additionalProperties": false
         },
         "call": {
             "type": "http",
-            "host": "http://localhost:3000/api",
+            "host": "/api",
             "method": "patch",
             "path": "/people/{id}"
         }
@@ -107,7 +116,7 @@
         },
         "call": {
             "type": "http",
-            "host": "http://localhost:3000/api",
+            "host": "/api",
             "method": "delete",
             "path": "/people/{id}"
         }
