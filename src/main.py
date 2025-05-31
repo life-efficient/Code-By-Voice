@@ -11,7 +11,7 @@ import openai
 from dotenv import load_dotenv
 from playsound import playsound
 import requests
-import get_tools  # Import the get_tools module
+import get_tools as get_tools  # Import the get_tools module
 import pprint
 from supabase_auth import get_supabase_access_token
 from audio_utils import AudioRecorder, callback, transcribe_with_openai, play_sound, speak_with_openai_tts
