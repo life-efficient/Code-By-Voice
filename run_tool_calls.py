@@ -10,14 +10,16 @@ def run_http_tool_call(tool_call_definition, params):
     call = tool_call_definition['call']
     if call['type'] == 'http':
         url = call['host'] + call['path']
+        print('url', url)
+        # scsd
         method = call['method'].upper()
         headers = {"Authorization": f"Bearer {token}"}  # Add Bearer token to all requests
         # Remove parameters that are part of the path
-        # path_params = {}
-        # for key in list(params.keys()):
-        #     if '{' + key + '}' in call['path']:
-        #         url = url.replace('{' + key + '}', str(params[key]))
-        #         path_params[key] = params.pop(key)
+        path_params = {}
+        for key in list(params.keys()):
+            if '{' + key + '}' in call['path']:
+                url = url.replace('{' + key + '}', str(params[key]))
+                path_params[key] = params.pop(key)
         try:
             if method == 'GET':
                 resp = requests.get(url, params=params, headers=headers)

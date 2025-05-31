@@ -3,6 +3,7 @@ from src.get_tools import get_tools
 from agents import FunctionTool
 from run_tool_calls import run_http_tool_call
 from pydantic_model_utils import make_pydantic_model_from_schema
+import json
 
 def generate_tool_docstring(tool):
     """
@@ -44,7 +45,8 @@ for tool_def in tools:
     if tool_def['call']['type'] == 'http':
         ToolModel = make_pydantic_model_from_schema(tool_def['parameters'], name=tool_def['name'] + 'Params')
         async def on_invoke_tool(ctx, args: str, ToolModel=ToolModel):
-            parsed = ToolModel.model_validate_json(args)
+            ToolModel.model_validate_json(args)
+            parsed = json.loads(args)
             print('tool params', parsed)
             return run_http_tool_call(tool_def, parsed)
         tool = FunctionTool(
@@ -54,7 +56,7 @@ for tool_def in tools:
             on_invoke_tool=on_invoke_tool,
         )
         generated_function_tools.append(tool)
-    # break
+    break
 
 
 # def get_people_tool():

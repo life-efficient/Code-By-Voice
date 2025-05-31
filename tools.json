@@ -25,14 +25,22 @@
                     "type": "string"
                 },
                 "email": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "phone": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
-                "name"
+                "name",
+                "email",
+                "phone"
             ],
             "additionalProperties": false
         },
@@ -77,17 +85,29 @@
                     "description": ""
                 },
                 "name": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "email": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "phone": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
-                "id"
+                "id",
+                "name",
+                "email",
+                "phone"
             ],
             "additionalProperties": false
         },

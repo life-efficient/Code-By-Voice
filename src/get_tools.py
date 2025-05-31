@@ -76,6 +76,53 @@ def ensure_required_on_objects(schema):
     else:
         return schema
 
+def transform_schema_strict_mode(schema, original_required=None):
+    """
+    Recursively transform schema for OpenAI strict mode:
+    - required: all property names
+    - additionalProperties: false
+    - optional/nullable fields: type includes 'null'
+    """
+    if isinstance(schema, dict):
+        if schema.get('type') == 'object' and 'properties' in schema:
+            properties = schema['properties']
+            # Use the schema's own 'required' if present, else from argument, else all keys
+            orig_required = schema.get('required', original_required if original_required is not None else list(properties.keys()))
+            new_properties = {}
+            for pname, pinfo in properties.items():
+                # Determine if this property is nullable or not required
+                is_nullable = pinfo.get('nullable', False)
+                is_required = pname in orig_required
+                # Remove nullable key
+                pinfo = dict(pinfo)
+                pinfo.pop('nullable', None)
+                # If not required or nullable, add 'null' to type
+                if not is_required or is_nullable:
+                    # If type is already a list, add 'null' if not present
+                    if isinstance(pinfo.get('type'), list):
+                        if 'null' not in pinfo['type']:
+                            pinfo['type'].append('null')
+                    else:
+                        pinfo['type'] = [pinfo.get('type', 'string'), 'null']
+                # Recurse
+                new_properties[pname] = transform_schema_strict_mode(pinfo)
+            schema['properties'] = new_properties
+            # All properties are required in strict mode
+            schema['required'] = list(properties.keys())
+            schema['additionalProperties'] = False
+            return schema
+        elif schema.get('type') == 'array' and 'items' in schema:
+            schema['items'] = transform_schema_strict_mode(schema['items'])
+            return schema
+        else:
+            for k, v in schema.items():
+                schema[k] = transform_schema_strict_mode(v)
+            return schema
+    elif isinstance(schema, list):
+        return [transform_schema_strict_mode(item) for item in schema]
+    else:
+        return schema
+
 def extract_tool_definitions(schema, host):
     tools = []
     for path, methods in schema.get('paths', {}).items():
@@ -126,6 +173,8 @@ def extract_tool_definitions(schema, host):
             }
             # Ensure every object (including nested) has a required key
             param_schema = ensure_required_on_objects(param_schema)
+            # Transform for OpenAI strict mode
+            param_schema = transform_schema_strict_mode(param_schema, original_required=filtered_required)
             # Ensure path is prefixed with /api
             api_path = path if path.startswith('/api') else '/api' + (path if path.startswith('/') else '/' + path)
             tools.append({
