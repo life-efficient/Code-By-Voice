@@ -3,7 +3,6 @@ from src.get_tools import get_tools
 from agents import FunctionTool
 from pydantic import create_model
 from run_tool_calls import run_http_tool_call
-import json
 
 def generate_tool_docstring(tool):
     """
@@ -60,8 +59,7 @@ for tool_def in tools:
             parsed = ToolModel.model_validate_json(args)
             print('tool params', parsed)
             return run_http_tool_call(tool_def, parsed)
-        params_schema = ToolModel.model_json_schema()
-        params_schema["additionalProperties"] = False
+        params_schema = tool_def.get('parameters', {})
         tool = FunctionTool(
             name=tool_def['name'],
             description=tool_def.get('description', ''),
@@ -69,7 +67,6 @@ for tool_def in tools:
             on_invoke_tool=on_invoke_tool,
         )
         generated_function_tools.append(tool)
-    break
 
 # def get_people_tool():
 #     get_people_tool_definition = tools[0]
@@ -114,7 +111,7 @@ double_number_tool_definition = {
 
 # generated_function_tools.append(generate_dummy_tool())
 # generated_function_tools.append(generate_double_number_tool())
-print(generated_function_tools)
+pprint(generated_function_tools, indent=4)
 
 if __name__ == "__main__":
     print(get_people_tool())
