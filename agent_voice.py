@@ -34,19 +34,13 @@ async def voice_assistant():
 
         # Input the buffer and await the result
         audio_input = AudioInput(buffer=recording)
-
         with trace("ACME App Voice Assistant"):
             result = await pipeline.run(audio_input)
-
-         # Transfer the streamed result into chunks of audio
         response_chunks = []
         async for event in result.stream():
             if event.type == "voice_stream_event_audio":
                 response_chunks.append(event.data)
-
         response_audio = np.concatenate(response_chunks, axis=0)
-
-        # Play response
         print("Assistant is responding...")
         sd.play(response_audio, samplerate=samplerate)
         sd.wait()
