@@ -437,13 +437,6 @@
                 "initiative_id": {
                     "type": "string"
                 },
-                "type": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "description": "Timeline event type (see timeline_event_type enum)"
-                },
                 "description": {
                     "type": [
                         "string",
@@ -454,7 +447,6 @@
             },
             "required": [
                 "initiative_id",
-                "type",
                 "description"
             ],
             "additionalProperties": false
@@ -476,13 +468,6 @@
                     "type": "string",
                     "description": ""
                 },
-                "type": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "description": "Timeline event type (see timeline_event_type enum)"
-                },
                 "description": {
                     "type": [
                         "string",
@@ -493,7 +478,6 @@
             },
             "required": [
                 "id",
-                "type",
                 "description"
             ],
             "additionalProperties": false

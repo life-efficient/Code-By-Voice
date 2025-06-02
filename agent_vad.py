@@ -27,7 +27,7 @@ def play_sound(filename):
 
 async def voice_assistant():
     samplerate = int(sd.query_devices(kind='input')['default_samplerate'])
-    model_path = "models/vosk-model-en-us-0.22"  # Updated to use the larger Vosk model
+    model_path = "models/vosk-model-small-en-us-0.15"  # Updated to use the larger Vosk model
     model = vosk.Model(model_path)
     q = queue.Queue()
 
