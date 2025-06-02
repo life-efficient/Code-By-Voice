@@ -4,6 +4,7 @@ from agents import FunctionTool
 from run_tool_calls import run_http_tool_call
 from pydantic_model_utils import make_pydantic_model_from_schema
 import json
+from agent_vad import play_sound
 
 # def generate_tool_docstring(tool):
 #     """
@@ -45,6 +46,7 @@ def make_on_invoke_tool(tool_def, ToolModel):
         ToolModel.model_validate_json(args)
         parsed = json.loads(args)
         print('tool params', parsed)
+        play_sound('whip')  # Play end/response sound (WAV only)
         return run_http_tool_call(tool_def, parsed)
     return on_invoke_tool
 

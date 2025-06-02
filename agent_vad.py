@@ -11,7 +11,7 @@ from scipy.io import wavfile
 
 # Wake and sleep word lists
 WAKE_WORDS = ['jarvis']
-SLEEP_WORDS = ['over', 'send it', 'jarvis go', 'jarvis end', 'jarvis send', 'jarvis over', 'jarvis finish']
+SLEEP_WORDS = ['send it', 'jarvis go', 'jarvis end', 'jarvis send', 'jarvis over', 'jarvis finish']
 
 # Function to play sound files (WAV only, using sounddevice and scipy.io.wavfile)
 def play_sound(filename):
@@ -77,7 +77,6 @@ async def voice_assistant():
                 response_chunks.append(event.data)
         response_audio = np.concatenate(response_chunks, axis=0)
         print("Assistant is responding...")
-        play_sound('whip')  # Play end/response sound (WAV only)
         sd.play(response_audio, samplerate=samplerate/2)
         sd.wait()
         print("---")

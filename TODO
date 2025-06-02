@@ -1,6 +1,5 @@
-Customise agent instructions
-Try elevenlabs voice provider to get it to sound more like Jarvis (measure the latency hit)
-Implement HTTP function calls
+Customise agent instructions to make it behave like Jarvis
+Try elevenlabs voice provider to get it to use a voice that sounds more like Jarvis (measure the latency hit)
 Implement LifeOS MCP
 Improve descriptions of different network methods
 Add descriptions to every key of openapi spec
@@ -13,3 +12,19 @@ Add calendar integration
 Deploy LifeOS to cloud with supabase instead of having to run locally
 
 Update text to speech instructions to encourage fast speaking
+
+Integrate search agent (https://github.com/openai/openai-agents-python/tree/main/examples/research_bot) using handoffs (https://openai.github.io/openai-agents-python/handoffs/)
+
+Integrate openai's example of voice interaction with voice activity detection (https://github.com/openai/openai-agents-python/tree/main/examples/voice/streamed)
+
+Add these tools (https://github.com/openai/openai-agents-python/tree/main/examples/tools)
+
+Integrate voice fingerprinting so Jarvis only responds to the user
+
+Replace the audio files with better sounds
+
+Implement interruption
+
+Implement mute/unmute
+
+Break up the agent_vad file into smaller self-contained files
