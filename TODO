@@ -1,12 +1,15 @@
-Add custom instructions
-Try elevenlabs voice provider
+Customise agent instructions
+Try elevenlabs voice provider to get it to sound more like Jarvis (measure the latency hit)
 Implement HTTP function calls
-Implement pulse MCP
+Implement LifeOS MCP
 Improve descriptions of different network methods
 Add descriptions to every key of openapi spec
 Automatically generate openapi spec from nextjs api routes
-Add api routes for other data manipulation
-Deploy OS to cloud with supabase
-Add voice chat loop to agent
-Persist history in voice chat loop
-Customise agent instructions
+Add api routes for other data manipulation (goal, latest summary, stakeholders, files)
+Add functions to create files
+Add function to trigger summary regeneration
+Add api endpoint to get overall project summary (there's a function that exists for this already)
+Add calendar integration
+Deploy LifeOS to cloud with supabase instead of having to run locally
+
+Update text to speech instructions to encourage fast speaking

@@ -13,7 +13,7 @@ async def voice_assistant():
     pipeline = VoicePipeline(
         workflow=SingleAgentVoiceWorkflow(jarvis),
     )
-    
+
     while True:
 
         # Check for input to either provide voice or exit

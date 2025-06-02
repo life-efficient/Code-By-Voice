@@ -38,6 +38,11 @@ def run_http_tool_call(tool_call_definition, params):
             try:
                 return resp.json()
             except Exception:
+                print('\n\n\nSomething went wrong')
+                print('response', resp)
+                print('resp.status_code', resp.status_code)
+                print('Response text', resp.text)
+                print('Reason', resp.reason)
                 return resp.text
         except Exception as e:
             return f"HTTP request failed: {e}"

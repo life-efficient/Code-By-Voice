@@ -101,13 +101,20 @@
                         "string",
                         "null"
                     ]
+                },
+                "keep_in_touch_frequency_days": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
                 }
             },
             "required": [
                 "id",
                 "name",
                 "email",
-                "phone"
+                "phone",
+                "keep_in_touch_frequency_days"
             ],
             "additionalProperties": false
         },
@@ -519,6 +526,105 @@
             "host": "http://localhost:3000",
             "method": "delete",
             "path": "/api/timeline-events/{id}"
+        }
+    },
+    {
+        "name": "get_people_notes",
+        "description": "List notes for a person",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "person_id": {
+                    "type": "string",
+                    "description": ""
+                }
+            },
+            "required": [
+                "person_id"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "get",
+            "path": "/api/people/notes"
+        }
+    },
+    {
+        "name": "post_people_notes",
+        "description": "Create a new note for a person",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "person_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "person_id",
+                "content"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "post",
+            "path": "/api/people/notes"
+        }
+    },
+    {
+        "name": "patch_people_notes__id_",
+        "description": "Update a person note by ID",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": ""
+                },
+                "content": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "content"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "patch",
+            "path": "/api/people/notes/{id}"
+        }
+    },
+    {
+        "name": "delete_people_notes__id_",
+        "description": "Delete a person note by ID",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": ""
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "additionalProperties": false
+        },
+        "call": {
+            "type": "http",
+            "host": "http://localhost:3000",
+            "method": "delete",
+            "path": "/api/people/notes/{id}"
         }
     }
 ]
