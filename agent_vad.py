@@ -9,7 +9,9 @@ import queue
 import os
 from scipy.io import wavfile
 
-
+# Wake and sleep word lists
+WAKE_WORDS = ['jarvis']
+SLEEP_WORDS = ['over', 'send it', 'jarvis go', 'jarvis end', 'jarvis send', 'jarvis over', 'jarvis finish']
 
 # Function to play sound files (WAV only, using sounddevice and scipy.io.wavfile)
 def play_sound(filename):
@@ -47,13 +49,13 @@ async def voice_assistant():
                 data = q.get()
                 if rec.AcceptWaveform(data):
                     result = rec.Result()
-                    if not triggered and 'jarvis' in result.lower():
+                    if not triggered and any(w in result.lower() for w in WAKE_WORDS):
                         print("Wake word detected. Start speaking...")
                         play_sound('positive')  # Play start listening sound (WAV only)
                         triggered = True
                         recording = []
                         continue
-                    if triggered and any(x in result.lower() for x in ['jarvis go', 'jarvis end', 'jarvis send', 'jarvis over', 'jarvis finish']):
+                    if triggered and any(x in result.lower() for x in SLEEP_WORDS):
                         print("End word detected. Processing...")
                         play_sound('loading')  # Play start processing sound (WAV only)
                         break
