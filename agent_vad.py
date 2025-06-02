@@ -11,7 +11,7 @@ from scipy.io import wavfile
 
 # Wake and sleep word lists
 WAKE_WORDS = ['jarvis']
-SLEEP_WORDS = ['send it', 'jarvis go', 'jarvis end', 'jarvis send', 'jarvis over', 'jarvis finish']
+SLEEP_WORDS = ['go go go', 'over and out', 'send it', 'jarvis go', 'jarvis end', 'jarvis send', 'jarvis over', 'jarvis finish']
 
 # Function to play sound files (WAV only, using sounddevice and scipy.io.wavfile)
 def play_sound(filename):
@@ -36,7 +36,7 @@ async def voice_assistant():
     def callback(indata, frames, time, status):
         q.put(bytes(indata))
 
-    print("Say 'Jarvis' to start speaking, and say one of: 'Jarvis go', 'Jarvis end', 'Jarvis send', 'Jarvis over', or 'Jarvis finish' to finish and send your command.")
+    print(f"Say one of {WAKE_WORDS} to start speaking, and say one of {SLEEP_WORDS} to finish and send your command.")
 
     while True:
         pipeline = VoicePipeline(workflow=SingleAgentVoiceWorkflow(jarvis))
